@@ -46,3 +46,18 @@ jobs:
           cd terraform
           terraform init -backend=false
           terraform validate
+
+  build-and-push:
+    name: Build & Push Docker Image
+    needs: [test-app, validate-terraform]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t cloud-telemetry-pipeline:latest .
