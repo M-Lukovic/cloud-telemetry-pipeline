@@ -74,4 +74,4 @@ jobs:
           context: ./app
           file: ./app/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/cloud-telemetry-pipeline:latest
+          tags: ghcr.io/m-lukovic/cloud-telemetry-pipeline:latest
