@@ -1,4 +1,4 @@
-output "config_file_path" {
-  value       = local_file.environment_config.filename
-  description = "Path to the generated environment configuration file"
+output "server_public_ip" {
+  description = "Public IP of the deployed AWS EC2 instance"
+  value       = aws_instance.telemetry_server.public_ip
 }
