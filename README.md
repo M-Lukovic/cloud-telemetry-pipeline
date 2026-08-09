@@ -11,7 +11,7 @@ A lightweight, containerized telemetry monitoring stack built with Python, Nginx
 ## Quick Start
 
 1. Clone the repository:
-git clone <URL_TVOG_REPOZITORIJUMA>
+git clone
 cd cloud-telemetry-pipeline
 
 2. Spin up the entire infrastructure:
