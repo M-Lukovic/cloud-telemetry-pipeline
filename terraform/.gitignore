@@ -1,6 +1,5 @@
-# Local .terraform directories
+# Terraform working directory
 .terraform/
-.terraform.lock.hcl
 
 # State files
 *.tfstate
@@ -10,5 +9,8 @@
 crash.log
 crash.*.log
 
-# Generated files
-env_config.txt
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

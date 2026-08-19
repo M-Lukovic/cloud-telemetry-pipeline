@@ -5,7 +5,7 @@ metadata:
   labels:
     app: telemetry-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: telemetry-api
@@ -14,11 +14,33 @@ spec:
       labels:
         app: telemetry-api
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: telemetry-api
-        image: mlukovic/cloud-telemetry-pipeline:latest
+        image: ghcr.io/m-lukovic/cloud-telemetry-pipeline:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         resources:
           limits:
             cpu: "250m"

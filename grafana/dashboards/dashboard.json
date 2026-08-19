@@ -1,53 +1,240 @@
 {
-  "annotations": { "list": [] },
+  "annotations": {
+    "list": []
+  },
+  "description": "Operational view of infrastructure and electrical-equipment telemetry exposed by the Flask service. Voltage is currently simulated and can later be replaced by data from an ESP32, sensor, or PLC gateway.",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": { "type": "prometheus", "uid": "Prometheus" },
-      "fieldConfig": { "defaults": { "custom": {}, "unit": "volt" }, "overrides": [] },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
       "id": 1,
-      "title": "System Voltage",
-      "type": "timeseries",
-      "targets": [
-        { "datasource": { "type": "prometheus", "uid": "Prometheus" }, "expr": "system_voltage_volts", "refId": "A" }
-      ]
+      "options": {
+        "content": "## Infrastructure & Equipment Telemetry Monitor\nVoltage is currently simulated by the application. The telemetry source can later be replaced by an ESP32, electrical sensor, or PLC gateway without changing the Prometheus-to-Grafana monitoring path.",
+        "mode": "markdown"
+      },
+      "title": "Telemetry Source",
+      "type": "text"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "Prometheus" },
-      "fieldConfig": { "defaults": { "custom": {}, "unit": "percent" }, "overrides": [] },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": { "color": "red", "text": "DOWN" },
+                "1": { "color": "green", "text": "UP" }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 4 },
       "id": 2,
-      "title": "CPU Usage",
-      "type": "timeseries",
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "Prometheus" }, "expr": "system_cpu_usage_percent", "refId": "A" }
-      ]
+        { "expr": "up{job=\"telemetry_app\"}", "legendFormat": "Telemetry application", "refId": "A" }
+      ],
+      "title": "Application Target",
+      "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "Prometheus" },
-      "fieldConfig": { "defaults": { "custom": {}, "unit": "percent" }, "overrides": [] },
-      "gridPos": { "h": 8, "w": 12, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "max": 240,
+          "min": 220,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 225 },
+              { "color": "red", "value": 235 }
+            ]
+          },
+          "unit": "volt"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 4 },
       "id": 3,
-      "title": "RAM Usage",
-      "type": "timeseries",
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "Prometheus" }, "expr": "system_ram_usage_percent", "refId": "A" }
-      ]
+        { "expr": "system_voltage_volts{job=\"telemetry_app\"}", "legendFormat": "Voltage", "refId": "A" }
+      ],
+      "title": "Equipment Voltage",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 4 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        { "expr": "system_cpu_usage_percent{job=\"telemetry_app\"}", "legendFormat": "CPU", "refId": "A" }
+      ],
+      "title": "Runtime-visible CPU",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 75 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 4 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        { "expr": "system_ram_usage_percent{job=\"telemetry_app\"}", "legendFormat": "Memory", "refId": "A" }
+      ],
+      "title": "Runtime-visible Memory",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "decimals": 2, "unit": "volt" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 9 },
+      "id": 6,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { "expr": "system_voltage_volts{job=\"telemetry_app\"}", "legendFormat": "Voltage", "refId": "A" }
+      ],
+      "title": "Voltage Trend",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "decimals": 2, "unit": "percent" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 9 },
+      "id": 7,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { "expr": "rate(process_cpu_seconds_total{job=\"telemetry_app\"}[1m]) * 100", "legendFormat": "Gunicorn worker {{instance}}", "refId": "A" }
+      ],
+      "title": "Application Process CPU",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "decimals": 1, "unit": "bytes" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 9 },
+      "id": 8,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { "expr": "process_resident_memory_bytes{job=\"telemetry_app\"}", "legendFormat": "Resident memory {{instance}}", "refId": "A" }
+      ],
+      "title": "Application Process Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "decimals": 3, "unit": "s" },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 17 },
+      "id": 9,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { "expr": "scrape_duration_seconds{job=\"telemetry_app\"}", "legendFormat": "Scrape duration", "refId": "A" }
+      ],
+      "title": "Prometheus Scrape Duration",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
   "schemaVersion": 38,
-  "style": "dark",
-  "tags": [],
+  "tags": ["infrastructure", "equipment", "telemetry"],
+  "templating": { "list": [] },
   "time": { "from": "now-15m", "to": "now" },
   "timepicker": {},
-  "timezone": "",
-  "title": "Telemetry Overview",
-  "uid": "telemetry-overview"
+  "timezone": "browser",
+  "title": "Infrastructure & Equipment Telemetry Monitor",
+  "uid": "infrastructure-equipment-telemetry",
+  "version": 1,
+  "weekStart": ""
 }

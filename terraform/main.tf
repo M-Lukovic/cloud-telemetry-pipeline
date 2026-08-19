@@ -9,34 +9,18 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = var.aws_region
 }
 
-# Security Group za HTTP (80), Telemetry API (5000) i SSH (22)
+# Educational EC2 scaffold. Application deployment is intentionally out of scope.
 resource "aws_security_group" "telemetry_sg" {
-  name        = "telemetry-pipeline-sg"
-  description = "Allow web and SSH traffic for telemetry app"
+  name        = "${var.service_name}-${var.environment}-sg"
+  description = "Allow public HTTP traffic to the telemetry EC2 scaffold"
 
   ingress {
     description = "Allow HTTP"
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow Telemetry API"
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow SSH"
-    from_port   = 22
-    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -49,20 +33,15 @@ resource "aws_security_group" "telemetry_sg" {
   }
 }
 
-# AWS EC2 instanca za pokretanje aplikacije
+# EC2 instance only; this resource does not install or run the application.
 resource "aws_instance" "telemetry_server" {
-  ami           = "ami-008280f43988698f2" # Ubuntu 22.04 LTS u eu-central-1
-  instance_type = "t2.micro"
+  ami           = var.ami_id
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [aws_security_group.telemetry_sg.id]
 
   tags = {
-    Name        = "Telemetry-Pipeline-Server"
-    Environment = "production"
+    Name        = "${var.service_name}-${var.environment}"
+    Environment = var.environment
   }
-}
-
-output "instance_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = aws_instance.telemetry_server.public_ip
 }
